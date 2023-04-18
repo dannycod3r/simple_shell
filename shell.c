@@ -9,21 +9,55 @@
  */
 int main(int ac, char **av, char **env)
 {
-	int i;
+	char *input = NULL, *args[MAX_ARGS], *token;
+	size_t input_size = 0;
+	int status, argc;
+	pid_t pid;
 
-/*Print the command-line arguments*/
-	printf("Command-line arguments:\n");
-	for (i = 0; i < ac; i++)
+	(void)ac;
+	(void)av;
+
+	while (1)
 	{
-		printf("  av[%d]: %s\n", i, av[i]);
+		printf("#cisfun$ ");
+
+		/*Read user input*/
+		if (getline(&input, &input_size, stdin) == -1)
+			break; /*Exit if EOF or error*/
+
+		/* Parse input into arguments*/
+		argc = 0;
+		token = strtok(input, " \t\n");
+		while (token != NULL && argc < MAX_ARGS - 1)
+		{
+			args[argc++] = token;
+			token = strtok(NULL, " \t\n");
+		}
+		args[argc] = NULL;
+
+		/* Execute command*/
+		if (argc > 0)
+		{
+			pid = fork();
+			if (pid < 0)
+			{
+				perror("fork");
+			}
+			else if (pid == 0)
+			{
+				/* Child process: execute command*/
+				execve(args[0], args, env);
+				perror("exec");
+				exit(1);
+			}
+			else
+			{
+				/* Parent process: wait for child to finish*/
+				waitpid(pid, &status, 0);
+			}
+		}
 	}
 
-/*Print the environment variables*/
-	printf("Environment variables:\n");
-	for (i = 0; env[i] != NULL; i++)
-	{
-		printf("  env[%d]: %s\n", i, env[i]);
-	}
-
+	free(input);
 	return (0);
 }
