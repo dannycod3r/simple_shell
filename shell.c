@@ -57,6 +57,9 @@ int main(int ac, char **av, char **env)
 		}
 		args[argc] = NULL;
 
+		if (argc > 0 && strcmp(args[0], "exit") == 0)
+			break;
+
 		/* Execute command*/
 		if (argc > 0)
 		{
