@@ -42,13 +42,14 @@ int main(int ac, char **av, char **env)
 			if (pid < 0)
 			{
 				perror("fork");
+				exit(EXIT_FAILURE);
 			}
 			else if (pid == 0)
 			{
 				/* Child process: execute command*/
 				execve(args[0], args, env);
 				perror("exec");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			else
 			{
@@ -59,5 +60,5 @@ int main(int ac, char **av, char **env)
 	}
 
 	free(input);
-	return (0);
+	return (EXIT_SUCCESS);
 }
