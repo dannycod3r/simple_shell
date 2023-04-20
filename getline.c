@@ -1,75 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-#define BUFFER_SIZE 1024
 
 /**
- * my_getline - Read a line of text from standard input
+ * custom_getline - reads input from specified input stream and stores in buffer.
  *
- * Return: A pointer to the line of text, or NULL if end of file is reached
+ * @input: pointer to a pointer that will store the input string.
+ * @input_size: pointer to variable that stores the size of input string.
+ * @stream: pointer to the input stream from which to read the input.
+ *
+ * Return: number of characters read, including the newline character, and -1 if an error occurs.
  */
-char *my_getline(void)
+int custom_getline(char **input, size_t *input_size, FILE *stream)
 {
-	static char buffer[BUFFER_SIZE];
-	static int buffer_index = 0;
-	static int buffer_size = 0;
-	char *line = NULL;
-	int line_index = 0;
-	/*int read_size = 0;*/
+	static char *buff = NULL;
+	static size_t buff_size = 0;
+	static size_t buff_index = 0;
+	int c;
+	size_t num_chars = 0;
+	size_t result_index;
+	char* result = malloc(buff_index + 1);
 
-	while (1)
+	if (input == NULL || input_size == NULL || stream == NULL)
 	{
-		/* Check if we need to read more data into the buffer */
-		if (buffer_index >= buffer_size)
+		return (-1);
+	}
+
+	if (buff == NULL)
+	{
+		buff_size = BUFSIZ;
+		buff = malloc(buff_size);
+	}
+
+	while ((c = fgetc(stream)) != EOF)
+	{
+		if (buff_index >= buff_size)
 		{
-			buffer_index = 0;
-			buffer_size = read(STDIN_FILENO, buffer, BUFFER_SIZE);
-			if (buffer_size == 0)
-			{
-				/* End of file reached */
-				if (line_index == 0)
-				{
-					return (NULL);
-				}
-				else
-				{
-					break;
-				}
-			}
-			if (buffer_size < 0)
-			{
-				perror("read");
-				exit(EXIT_FAILURE);
-			}
+			buff_size += BUFSIZ;
+			buff = realloc(buff, buff_size);
 		}
-		/* Check if we need to allocate more memory for the line */
-		if (line_index == 0)
+
+		buff[buff_index++] = (char) c;
+		num_chars++;
+		if (c == '\n')
 		{
-			line = (char *) malloc(BUFFER_SIZE);
-		}
-		else if (line_index % BUFFER_SIZE == 0)
-		{
-			line = (char *) realloc(line, line_index + BUFFER_SIZE);
-		}
-		/* Copy characters from the buffer to the line until we reach a newline or the end of the buffer */
-		while (buffer_index < buffer_size)
-		{
-			if (buffer[buffer_index] == '\n')
-			{
-				line[line_index] = '\0';
-				buffer_index++;
-				return (line);
-			}
-			else
-			{
-				line[line_index] = buffer[buffer_index];
-				line_index++;
-				buffer_index++;
-			}
+			break;
 		}
 	}
-	/* Null terminate the line and return it */
-	line[line_index] = '\0';
-	return (line);
+	if (buff_index == 0 && c == EOF)
+	{
+		return (-1);
+	}
+	buff[buff_index] = '\0';
+	*input = buff;
+	*input_size = buff_index;
+	for (result_index = 0; result_index < buff_index; result_index++)
+	{
+		result[result_index] = buff[result_index];
+	}
+	result[result_index] = '\0';
+
+	buff_index = 0;
+	*input = result;
+	*input_size = num_chars;
+
+	return (int) num_chars;
 }
