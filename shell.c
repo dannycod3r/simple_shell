@@ -44,7 +44,9 @@ int main(int ac, char **av, char **env)
 		printf("#cisfun$ ");
 
 		/*Read user input*/
-		if (getline(&input, &input_size, stdin) == -1)
+
+		/* Implement custome getline function */
+		if (custom_getline(&input, &input_size, stdin) == -1)
 			break; /*Exit if EOF or error*/
 
 		/* Parse input into arguments*/
