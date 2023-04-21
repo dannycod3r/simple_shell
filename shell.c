@@ -21,6 +21,7 @@ int main(int ac, char **av, char **env)
 	pid_t pid;
 	path_t *head = NULL, *new_path, *next_path, *current_path;
 
+	int exit_status = 0; /* Initializing exit status */
 	(void)ac;
 	(void)av;
 
@@ -44,7 +45,9 @@ int main(int ac, char **av, char **env)
 		printf("#cisfun$ ");
 
 		/*Read user input*/
-		if (getline(&input, &input_size, stdin) == -1)
+
+		/* Implement custome getline function */
+		if (custom_getline(&input, &input_size, stdin) == -1)
 			break; /*Exit if EOF or error*/
 
 		/* Parse input into arguments*/
@@ -57,8 +60,57 @@ int main(int ac, char **av, char **env)
 		}
 		args[argc] = NULL;
 
+
+		/* Implement exit built-in function with arguments */
+
 		if (argc > 0 && strcmp(args[0], "exit") == 0)
+		{
+			if (argc > 1)
+			{
+				exit_status = atoi(args[1]);
+			}
+			else
+			{
+				exit_status = EXIT_SUCCESS;
+			}
 			break;
+		}
+
+		/* Implement setenv built in function */
+
+		if (argc > 2 && strcmp(args[0], "setenv") == 0)
+                {
+                        if (set_env(args[1], args[2]) != 0)
+                        {
+                                fprintf(stderr, "Failed to set environment variable.\n");
+                        }
+                }
+
+		/* Implement unsetenv built in function */
+
+                if (argc > 1 && strcmp(args[0], "unsetenv") == 0)
+                {
+                        if (unset_env(args[1]) != 0)
+                        {
+                                fprintf(stderr, "Failed to unset environment variable.\n");
+                        }
+                }
+
+		/* Implement the cd built in function */
+
+		if (argc > 0 && strcmp(args[0], "cd") == 0)
+		{
+			if (argc > 2)
+			{
+				fprintf(stderr, "cd: too many arguments\n");
+				continue;
+			}
+
+			if (change_directory(argc == 1 ? NULL : args[1]) == -1)
+				perror("cd");
+
+			continue;
+		}
 
 		/* Execute command*/
 		if (argc > 0)
@@ -120,5 +172,5 @@ int main(int ac, char **av, char **env)
 	}
 
 	free(input);
-	return (EXIT_SUCCESS);
+	return (exit_status); /* handle arguments for the in-built exit function */
 }
