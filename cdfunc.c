@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
-
+#include "utils.h"
 
 /**
  * change_directory - changes the current working directory

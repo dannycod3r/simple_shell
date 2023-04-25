@@ -11,11 +11,10 @@ int main(int ac, char **av, char **env)
 {
 	char *input = NULL, *args[MAX_ARGS], *token, *path_env, *full_path;
 	size_t input_size = 0;
-	int status, argc, found_executable;
+	int status, argc, found_executable, exit_status = 0;
 	pid_t pid;
-	path_t *head = NULL, *new_path, *next_path, *current_path;
+	path_t *head = NULL, *current_path;
 
-	int exit_status = 0; /* Initializing exit status */
 	(void)ac;
 	(void)av;
 
@@ -26,10 +25,7 @@ int main(int ac, char **av, char **env)
 		token = strtok(path_env, ":");
 		while (token != NULL)
 		{
-			new_path = malloc(sizeof(path_t));
-			new_path->path = strdup(token);
-			new_path->next = head;
-			head = new_path;
+			head = add_path(&head, token);
 			token = strtok(NULL, ":");
 		}
 	}
@@ -39,7 +35,6 @@ int main(int ac, char **av, char **env)
 		printf("#cisfun$ ");
 
 		/*Read user input*/
-
 		/* Implement custome getline function */
 		if (custom_getline(&input, &input_size, stdin) == -1)
 			break; /*Exit if EOF or error*/
@@ -54,44 +49,27 @@ int main(int ac, char **av, char **env)
 		}
 		args[argc] = NULL;
 
-
 		/* Implement exit built-in function with arguments */
-
 		if (argc > 0 && strcmp(args[0], "exit") == 0)
 		{
 			if (argc > 1)
-			{
 				exit_status = atoi(args[1]);
-			}
 			else
-			{
 				exit_status = EXIT_SUCCESS;
-			}
 			break;
 		}
 
 		/* Implement setenv built in function */
-
 		if (argc > 2 && strcmp(args[0], "setenv") == 0)
-                {
-                        if (set_env(args[1], args[2]) != 0)
-                        {
-                                fprintf(stderr, "Failed to set environment variable.\n");
-                        }
-                }
+			if (set_env(args[1], args[2]) != 0)
+				fprintf(stderr, "Failed to set environment variable.\n");
 
 		/* Implement unsetenv built in function */
-
-                if (argc > 1 && strcmp(args[0], "unsetenv") == 0)
-                {
-                        if (unset_env(args[1]) != 0)
-                        {
-                                fprintf(stderr, "Failed to unset environment variable.\n");
-                        }
-                }
+		if (argc > 1 && strcmp(args[0], "unsetenv") == 0)
+			if (unset_env(args[1]) != 0)
+				fprintf(stderr, "Failed to unset environment variable.\n");
 
 		/* Implement the cd built in function */
-
 		if (argc > 0 && strcmp(args[0], "cd") == 0)
 		{
 			if (argc > 2)
@@ -118,21 +96,31 @@ int main(int ac, char **av, char **env)
 			else if (pid == 0)
 			{
 				found_executable = 0;
-				current_path = head;
-				while (current_path != NULL)
+				if (args[0][0] == '/')
 				{
-					full_path = malloc(strlen(current_path->path) + strlen(args[0]) + 2);
-					sprintf(full_path, "%s/%s", current_path->path, args[0]);
-					if (access(full_path, X_OK) == 0) {
-						/*Found executable in PATH directory*/
-						args[0] = full_path;
+					if (access(args[0], X_OK) == 0)
 						found_executable = 1;
-						break;
-					}
-					free(full_path);
-					current_path = current_path->next;
 				}
-				if (found_executable) {
+				else
+				{
+					current_path = head;
+					while (current_path != NULL)
+					{
+						full_path = malloc(strlen(current_path->path) + strlen(args[0]) + 2);
+						sprintf(full_path, "%s/%s", current_path->path, args[0]);
+						if (access(full_path, X_OK) == 0)
+						{
+							/*Found executable in PATH directory*/
+							args[0] = full_path;
+							found_executable = 1;
+							break;
+						}
+						free(full_path);
+						current_path = current_path->next;
+					}
+				}
+				if (found_executable)
+				{
 					execve(args[0], args, env);
 					perror("exec");
 					exit(EXIT_FAILURE);
@@ -156,15 +144,9 @@ int main(int ac, char **av, char **env)
 		}
 	}
 	/*free memory*/
-	current_path = head;
-	while (current_path != NULL)
-	{
-		next_path = current_path->next;
-		free(current_path->path);
-		free(current_path);
-		current_path = next_path;
-	}
+	free_path(head);
 
 	free(input);
-	return (exit_status); /* handle arguments for the in-built exit function */
+	/* handle arguments for the in-built exit function */
+	return (exit_status);
 }

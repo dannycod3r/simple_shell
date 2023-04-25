@@ -1,29 +1,23 @@
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "libs.h"
 /**
- * custom_getline - reads input from specified input stream and stores in buffer.
- *
+ * custom_getline - read input from specified input stream and stores in buffer
  * @input: pointer to a pointer that will store the input string.
  * @input_size: pointer to variable that stores the size of input string.
  * @stream: pointer to the input stream from which to read the input.
- *
- * Return: number of characters read, including the newline character, and -1 if an error occurs.
+ * Return: number of characters read, including the newline character,
+ * and -1 if an error occurs.
  */
 int custom_getline(char **input, size_t *input_size, FILE *stream)
 {
-	static char *buff = NULL;
-	static size_t buff_size = 0;
-	static size_t buff_index = 0;
+	static char *buff;
+	static size_t buff_size;
+	static size_t buff_index;
 	int c;
-	size_t num_chars = 0;
-	size_t result_index;
-	char* result = malloc(buff_index + 1);
+	size_t num_chars = 0, result_index;
+	char *result = malloc(buff_index + 1);
 
 	if (input == NULL || input_size == NULL || stream == NULL)
-	{
 		return (-1);
-	}
 
 	if (buff == NULL)
 	{
@@ -42,26 +36,21 @@ int custom_getline(char **input, size_t *input_size, FILE *stream)
 		buff[buff_index++] = (char) c;
 		num_chars++;
 		if (c == '\n')
-		{
 			break;
-		}
 	}
 	if (buff_index == 0 && c == EOF)
-	{
 		return (-1);
-	}
+
 	buff[buff_index] = '\0';
 	*input = buff;
 	*input_size = buff_index;
 	for (result_index = 0; result_index < buff_index; result_index++)
-	{
 		result[result_index] = buff[result_index];
-	}
 	result[result_index] = '\0';
 
 	buff_index = 0;
 	*input = result;
 	*input_size = num_chars;
 
-	return (int) num_chars;
+	return ((int) num_chars);
 }

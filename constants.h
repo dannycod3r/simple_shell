@@ -8,7 +8,13 @@
 #define BUFFER_SIZE 1024
 
 /*linked list node for PATH dir*/
-typedef struct path_n {
+/**
+ * struct path_n- node structure for path
+ * @path: string. path
+ * @next: struct path_n. next path
+ */
+typedef struct path_n
+{
 	char *path;
 	struct path_n *next;
 } path_t;

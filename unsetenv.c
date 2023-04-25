@@ -10,7 +10,7 @@
 int unset_env(char *name)
 {
 	int result = unsetenv(name);
-	
+
 	if (name == NULL || name[0] == '\0')
 	{
 		fprintf(stderr, "unsetenv: invalid argument\n");
