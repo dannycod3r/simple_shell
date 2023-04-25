@@ -1,11 +1,5 @@
 #include "simple_shell.h"
 
-/*linked list node for PATH dir*/
-typedef struct path_n {
-	char *path;
-	struct path_n *next;
-} path_t;
-
 /**
  * main - program entry
  * @ac: int. arguement count

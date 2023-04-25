@@ -7,5 +7,10 @@
 
 #define BUFFER_SIZE 1024
 
+/*linked list node for PATH dir*/
+typedef struct path_n {
+	char *path;
+	struct path_n *next;
+} path_t;
 
 #endif /*_CONSTANTS_H*/
