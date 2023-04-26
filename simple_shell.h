@@ -7,6 +7,6 @@
 #include "utils.h"
 
 /*program entry point*/
-int main(int ac, char **av);
+int main(int ac, char **av, char **env);
 
 #endif /*_SIMPLE_SHELL_H*/

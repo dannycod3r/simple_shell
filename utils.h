@@ -1,6 +1,6 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 /*utils.h - includes declarations for all helper functions*/
-void execmd(char **argv);
 
+int execute_command(char **args, char **env);
 #endif  /*_UTILS_H*/

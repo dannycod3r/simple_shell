@@ -3,93 +3,80 @@
 /**
  * main - program entry
  * @ac: int. arguement count
- * @argv: string. null terminated array of arguements
+ * @av: string. null terminated array of arguements
+ * @env: string. null terminated array of arguements
  * Return: 0
  */
-int main(int ac, char **argv)
+int main(int ac, char **av, char **env)
 {
-	char *token;
-	char *input = NULL, *input_copy = NULL;
-	size_t n = 0;
-	ssize_t nchars_read;
-	const char *delim = " \n";
-	int num_tokens = 0, i;
+	char *input = NULL, *args[MAX_ARGS], *token;
+	size_t input_size = 0;
+	int argc;
 
 	(void)ac;
+	(void)av;
 
 	while (1)
 	{
 		printf("#cisfun$ ");
-		nchars_read = getline(&input, &n, stdin);
-		/* c*/
-		if (nchars_read == -1)
-			return (-1);
 
-		/* allocate space for a copy of the input */
-		input_copy = malloc(sizeof(char) * nchars_read);
-		if (input_copy == NULL)
+		/*Read user input*/
+		if (getline(&input, &input_size, stdin) == -1)
 		{
-			perror("mem alloc error");
-			return (-1);
+			printf("\n");
+			break; /*Exit if EOF or error*/
 		}
-		/* copy input to input_copy */
-		strcpy(input_copy, input);
 
-		token = strtok(input, delim);
-		while (token != NULL)
+		/* Parse input into arguments*/
+		argc = 0;
+		token = strtok(input, " \t\n");
+		while (token != NULL && argc < MAX_ARGS - 1)
 		{
-			num_tokens++;
-			token = strtok(NULL, delim);
+			args[argc++] = token;
+			token = strtok(NULL, " \t\n");
 		}
-		num_tokens++;
+		args[argc] = NULL;
 
-		/* Allocate space to hold the array of strings */
-		argv = malloc(sizeof(char *) * num_tokens);
-
-		/* Store each token in the argv array */
-		token = strtok(input_copy, delim);
-
-		for (i = 0; token != NULL; i++)
-		{
-			argv[i] = malloc(sizeof(char) * strlen(token));
-			strcpy(argv[i], token);
-
-			token = strtok(NULL, delim);
-		}
-		argv[i] = NULL;
-
-		/* execute the command */
-		execmd(argv);
-
+		/* Execute command*/
+		if (argc > 0)
+			execute_command(args, env);
 	}
 
-
-	/* free up allocated memory */
-	free(input_copy);
 	free(input);
+	return (EXIT_SUCCESS);
+}
+
+/**
+ * execute_command - forks a child process and executes a command within it
+ * @args: null-terminated array of command-line arguments
+ * @env: null-terminated array of environment variables
+ *
+ * Return: On success, 0. On failure, -1.
+ */
+int execute_command(char **args, char **env)
+{
+	pid_t pid;
+	int status;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("fork");
+		return (-1);
+	}
+	else if (pid == 0)
+	{
+		/* Child process: execute command*/
+		execve(args[0], args, env);
+		perror("exec");
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		/* Parent process: wait for child to finish*/
+		waitpid(pid, &status, 0);
+	}
 
 	return (0);
 }
 
-
-/**
- * execmd - executes a given command
- * @argv: array of strings containing command and its args
- * Return: void
- */
-
-void execmd(char **argv)
-{
-	char *command = NULL;
-
-	if (argv)
-	{
-		/* get the command */
-		command = argv[0];
-
-		/* execute the command with execve */
-		if (execve(command, argv, NULL) == -1)
-			perror(command);
-	}
-
-}
