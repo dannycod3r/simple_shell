@@ -4,6 +4,8 @@
 
 int execute_command(char **args, char **env, char **av);
 
+void ignore_ctrlc(int signal);
+
 int _puts(const char *s);
 int _putchar(char c);
 

@@ -14,8 +14,8 @@ int main(int ac, char **av, char **env)
 	int argc;
 
 	(void)ac;
-	/*(void)av;*/
 
+	signal(SIGINT, ignore_ctrlc);
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
@@ -52,7 +52,7 @@ int main(int ac, char **av, char **env)
  * execute_command - forks a child process and executes a command within it
  * @args: null-terminated array of command-line arguments
  * @env: null-terminated array of environment variables
- *
+ * @av: string of args
  * Return: On success, 0. On failure, -1.
  */
 int execute_command(char **args, char **env, char **av)
@@ -108,4 +108,18 @@ int _puts(const char *s)
 		if (_putchar(s[i]) == EOF)
 			return (EOF);
 	return (0);
+}
+
+/**
+ * ignore_ctrlc - ignore control C to exit the shell
+ * @signal: signal
+ * Return: void
+ */
+void ignore_ctrlc(int signal)
+{
+	if (signal == SIGINT)
+	{
+		_putchar('\n');
+		_puts("#cisfun$ ");
+	}
 }
