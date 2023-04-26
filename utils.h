@@ -2,7 +2,7 @@
 #define _UTILS_H
 /*utils.h - includes declarations for all helper functions*/
 
-int execute_command(char **args, char **env);
+int execute_command(char **args, char **env, char **av);
 
 int _puts(const char *s);
 int _putchar(char c);

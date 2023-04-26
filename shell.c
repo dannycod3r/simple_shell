@@ -14,7 +14,7 @@ int main(int ac, char **av, char **env)
 	int argc;
 
 	(void)ac;
-	(void)av;
+	/*(void)av;*/
 
 	while (1)
 	{
@@ -41,7 +41,7 @@ int main(int ac, char **av, char **env)
 
 		/* Execute command*/
 		if (argc > 0)
-			execute_command(args, env);
+			execute_command(args, env, av);
 	}
 
 	free(input);
@@ -55,7 +55,7 @@ int main(int ac, char **av, char **env)
  *
  * Return: On success, 0. On failure, -1.
  */
-int execute_command(char **args, char **env)
+int execute_command(char **args, char **env, char **av)
 {
 	pid_t pid;
 	int status;
@@ -70,7 +70,7 @@ int execute_command(char **args, char **env)
 	{
 		/* Child process: execute command*/
 		execve(args[0], args, env);
-		perror("exec");
+		perror(av[0]);
 		exit(EXIT_FAILURE);
 	}
 	else
