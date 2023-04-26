@@ -18,12 +18,12 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
-		printf("#cisfun$ ");
+		_puts("#cisfun$ ");
 
 		/*Read user input*/
 		if (getline(&input, &input_size, stdin) == -1)
 		{
-			printf("\n");
+			_puts("\n");
 			break; /*Exit if EOF or error*/
 		}
 
@@ -73,6 +73,7 @@ int execute_command(char **args, char **env)
 	}
 	else
 	{
+
 		/* Parent process: wait for child to finish*/
 		waitpid(pid, &status, 0);
 	}
@@ -80,3 +81,29 @@ int execute_command(char **args, char **env)
 	return (0);
 }
 
+/**
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
+ */
+int _putchar(char c)
+{
+	return (write(1, &c, 1));
+}
+
+/**
+ * _puts - print to stdout
+ * @s: string
+ * Return: character
+ */
+int _puts(const char *s)
+{
+	int i;
+
+	for (i = 0; s[i] != '\0'; i++)
+		if (_putchar(s[i]) == EOF)
+			return (EOF);
+	return (0);
+}
