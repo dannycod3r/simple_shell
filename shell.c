@@ -18,12 +18,14 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
-		_puts("#cisfun$ ");
+		if (isatty(STDIN_FILENO))
+			_puts("#cisfun$ ");
 
 		/*Read user input*/
 		if (getline(&input, &input_size, stdin) == -1)
 		{
-			_puts("\n");
+			if (isatty(STDIN_FILENO))
+				_puts("\n");
 			break; /*Exit if EOF or error*/
 		}
 
