@@ -50,7 +50,7 @@ int main(int ac, char **av, char **env)
 		args[argc] = NULL;
 
 		/* Implement exit built-in function with arguments */
-		if (argc > 0 && strcmp(args[0], "exit") == 0)
+		if (argc > 0 && my_strcmp(args[0], "exit") == 0)
 		{
 			if (argc > 1)
 				exit_status = atoi(args[1]);
@@ -60,17 +60,17 @@ int main(int ac, char **av, char **env)
 		}
 
 		/* Implement setenv built in function */
-		if (argc > 2 && strcmp(args[0], "setenv") == 0)
+		if (argc > 2 && my_strcmp(args[0], "setenv") == 0)
 			if (set_env(args[1], args[2]) != 0)
 				fprintf(stderr, "Failed to set environment variable.\n");
 
 		/* Implement unsetenv built in function */
-		if (argc > 1 && strcmp(args[0], "unsetenv") == 0)
+		if (argc > 1 && my_strcmp(args[0], "unsetenv") == 0)
 			if (unset_env(args[1]) != 0)
 				fprintf(stderr, "Failed to unset environment variable.\n");
 
 		/* Implement the cd built in function */
-		if (argc > 0 && strcmp(args[0], "cd") == 0)
+		if (argc > 0 && my_strcmp(args[0], "cd") == 0)
 		{
 			if (argc > 2)
 			{

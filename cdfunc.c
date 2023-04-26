@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "simple_shell.h"
 
 /**
  * change_directory - changes the current working directory
@@ -10,7 +11,7 @@ int change_directory(char *dir)
 	char *cwd = NULL;
 	int ret;
 
-	if (dir == NULL || strcmp(dir, "~") == 0)
+	if (dir == NULL || my_strcmp(dir, "~") == 0)
 	{
 		dir = getenv("HOME");
 		if (dir == NULL)
@@ -19,7 +20,7 @@ int change_directory(char *dir)
 			return (-1);
 		}
 	}
-	if (strcmp(dir, "-") == 0)
+	if (my_strcmp(dir, "-") == 0)
 	{
 		dir = getenv("OLDPWD");
 		if (dir == NULL)
